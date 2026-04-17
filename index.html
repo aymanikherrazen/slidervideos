@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
@@ -7,9 +7,8 @@
   <!-- Poppins Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ----- RESET & GLOBAL ----- */
     * {
       margin: 0;
       padding: 0;
@@ -17,7 +16,7 @@
     }
 
     body {
-      background: #2bb3f3;
+      background: #3bb3f3;
       font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       display: flex;
       flex-direction: column;
@@ -25,7 +24,7 @@
       justify-content: center;
       min-height: 100vh;
       margin: 0;
-      padding: 2rem 1rem;
+      padding: 0;
       color: #1e1e1e;
       -webkit-font-smoothing: antialiased;
     }
@@ -34,16 +33,18 @@
       max-width: 1280px;
       width: 100%;
       margin: 0 auto;
+      padding: 0;
     }
 
     .section-title {
-      font-weight: 500;
-      font-size: 1.6rem;
+      font-weight: 600;
+      font-size: 1.8rem;
       letter-spacing: -0.02em;
-      margin-bottom: 1.25rem;
-      padding-left: 0.25rem;
+      margin-bottom: 0;
+      padding: 0 0 0 0.25rem;
       color: #1a1a1a;
       font-family: 'Poppins', sans-serif;
+      line-height: 1.2;
     }
 
     .section-title span {
@@ -51,32 +52,30 @@
       color: #5a5a5a;
     }
 
-    /* ----- SLIDER CONTAINER ----- */
     .slider-container {
       position: relative;
       width: 100%;
       user-select: none;
       -webkit-user-select: none;
-      margin-bottom: 0.75rem;
-      background: #2bb3f3;  /* Slider background */
-      border-radius: 20px;
-      padding: 20px 0;
+      margin-bottom: 0;
+      background: #2bb3f3;
+      border-radius: 0;
+      padding: 12px 0 8px;
     }
 
     .carousel-viewport {
       overflow: hidden;
       width: 100%;
-      border-radius: 20px;
     }
 
     .carousel-track {
       display: flex;
-      gap: 16px;
+      gap: 12px;
       will-change: transform;
       transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       transform: translateX(0);
       cursor: grab;
-      padding: 0 8px;
+      padding: 4px 8px;
     }
 
     .carousel-track.dragging {
@@ -84,16 +83,19 @@
       cursor: grabbing;
     }
 
-    /* ----- CARD STYLING ----- */
     .ugc-card {
-      flex: 0 0 calc((100% - 32px) / 3);
-      max-width: calc((100% - 32px) / 3);
+      flex: 0 0 calc((100% - 24px) / 3);
+      max-width: calc((100% - 24px) / 3);
       background: transparent;
       border-radius: 16px;
-      transition: box-shadow 0.2s ease;
-      overflow: hidden;
+      transition: transform 0.2s ease;
+      overflow: visible;
       display: flex;
       flex-direction: column;
+    }
+
+    .ugc-card:hover {
+      transform: translateY(-2px);
     }
 
     .video-wrapper {
@@ -106,7 +108,7 @@
       border-radius: 14px;
       overflow: hidden;
       cursor: pointer;
-      border: 1.5px solid white;  /* White border around each video */
+      border: 1.5px solid white;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
@@ -116,92 +118,211 @@
       object-fit: cover;
       display: block;
       background: #000;
+    }
+
+    /* Video Controls Overlay */
+    .video-controls-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+      padding: 40px 12px 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       pointer-events: none;
     }
 
+    .video-wrapper:hover .video-controls-overlay,
+    .video-wrapper.playing .video-controls-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: white;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.08);
+    }
+
+    .control-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+      stroke: white;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Play overlay (centered) */
     .play-overlay {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 52px;
-      height: 52px;
-      background: rgba(255, 255, 255, 0.9);
+      width: 56px;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(4px);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-      transition: all 0.2s ease;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
       pointer-events: none;
-      border: 1.5px solid white;
+      border: 2px solid white;
+      opacity: 1;
+    }
+
+    .video-wrapper.playing .play-overlay {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.8);
     }
 
     .play-overlay svg {
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       fill: #083d77;
       margin-left: 3px;
     }
 
-    .video-wrapper:hover .play-overlay {
-      background: #ffffff;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      transform: translate(-50%, -50%) scale(1.05);
+    /* Influencer info overlay - centered */
+    .influencer-overlay {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      color: white;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      z-index: 5;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      width: 90%;
     }
 
-    .card-meta {
-      padding: 12px 8px 8px;
-      background: transparent;
+    .video-wrapper.playing .influencer-overlay {
+      opacity: 0;
+    }
+
+    .influencer-row-overlay {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 6px;
     }
 
-    .influencer {
-      font-weight: 500;
-      font-size: 0.95rem;
-      letter-spacing: -0.01em;
-      color: white;
+    .ig-icon-link-overlay {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .ig-icon-overlay {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ig-icon-overlay svg {
+      width: 14px;
+      height: 14px;
+      fill: white;
+    }
+
+    .influencer-name-wrapper-overlay {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .influencer-name-overlay {
+      font-size: 1.1rem;
+      font-weight: 600;
       font-family: 'Poppins', sans-serif;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      white-space: nowrap;
     }
 
-    .rating {
+    .verified-badge-overlay {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: #0095f6;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .verified-badge-overlay svg {
+      width: 10px;
+      height: 10px;
+      fill: white;
+    }
+
+    /* Rating stars - below influencer */
+    .rating-overlay {
       color: #FFD700;
-      font-size: 0.9rem;
-      letter-spacing: 2px;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      font-size: 1.1rem;
+      letter-spacing: 3px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      white-space: nowrap;
+      line-height: 1.4;
     }
 
-    /* ----- PROGRESS BAR ----- */
+    /* Progress bar */
     .progress-container {
       width: 100%;
       height: 4px;
       background: rgba(255, 255, 255, 0.3);
-      border-radius: 20px;
-      margin: 6px 0 4px;
       overflow: hidden;
+      margin-top: 4px;
     }
 
     .progress-fill {
       height: 100%;
       width: 0%;
-      background: #083d77;  /* Progress bar color */
-      border-radius: 20px;
+      background: #083d77;
       transition: width 0.1s linear;
       will-change: width;
     }
 
-    /* ----- ARROW BUTTONS ----- */
+    /* Arrow buttons */
     .slider-btn {
       position: absolute;
       top: calc(50% - 28px);
       transform: translateY(-50%);
       width: 44px;
       height: 44px;
-      background: #083d77;  /* Arrow button background */
+      background: #083d77;
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       border-radius: 40px;
@@ -209,7 +330,7 @@
       align-items: center;
       justify-content: center;
       border: 1.5px solid white;
-      color: white;  /* Arrow text/icon color */
+      color: white;
       cursor: pointer;
       z-index: 10;
       transition: all 0.2s ease;
@@ -244,137 +365,54 @@
       right: 12px;
     }
 
-    /* ----- MODAL POPUP ----- */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(8, 61, 119, 0.85);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.25s ease, visibility 0.25s;
-      padding: 16px;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal-content {
-      background: #1a1817;
-      border-radius: 28px;
-      max-width: 400px;
-      width: 100%;
-      max-height: 80vh;
-      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
-      position: relative;
-      border: 2px solid white;
-      transform: scale(0.98);
-      transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1);
-    }
-
-    .active .modal-content {
-      transform: scale(1);
-    }
-
-    .modal-video {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 24px 24px 16px 16px;
-      aspect-ratio: 9 / 16;
-      object-fit: cover;
-      background: #000;
-    }
-
-    .close-modal {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 40px;
-      height: 40px;
-      background: #083d77;
-      backdrop-filter: blur(8px);
-      border-radius: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid white;
-      cursor: pointer;
-      color: white;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .close-modal:hover {
-      background: #0a4a8a;
-      transform: scale(1.05);
-    }
-
-    .close-modal svg {
-      width: 20px;
-      height: 20px;
-      stroke: white;
-      stroke-width: 2.5;
-    }
-
-    /* ----- MOBILE RESPONSIVE ----- */
+    /* Mobile responsive */
     @media (max-width: 680px) {
       .ugc-card {
-        flex: 0 0 calc((100% - 16px) / 2);
-        max-width: calc((100% - 16px) / 2);
+        flex: 0 0 calc((100% - 12px) / 2);
+        max-width: calc((100% - 12px) / 2);
       }
       .carousel-track {
-        gap: 12px;
+        gap: 8px;
       }
       .slider-btn {
         width: 40px;
         height: 40px;
       }
       .section-title {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
+        padding-left: 8px;
       }
       .slider-container {
-        padding: 16px 0;
+        padding: 8px 0 6px;
+      }
+      .influencer-name-overlay {
+        font-size: 0.95rem;
       }
     }
 
-    /* Keep same vertical space for mobile and PC */
     @media (max-width: 480px) {
       .video-wrapper {
-        max-height: 320px;
-        min-height: 280px;
+        max-height: 300px;
+        min-height: 260px;
       }
-    }
-
-    /* Ensure consistent vertical space across devices */
-    .video-wrapper {
-      height: auto;
+      .influencer-overlay {
+        bottom: 60px;
+      }
     }
   </style>
 </head>
 <body>
 <div class="ugc-showcase">
-  
 
   <div class="slider-container" id="ugcSlider">
     <div class="carousel-viewport">
       <div class="carousel-track" id="carouselTrack"></div>
     </div>
 
-    <div class="slider-btn btn-left" id="prevBtn" aria-label="Previous">
+    <div class="slider-btn btn-left" id="prevBtn" aria-label="Précédent">
       <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
     </div>
-    <div class="slider-btn btn-right" id="nextBtn" aria-label="Next">
+    <div class="slider-btn btn-right" id="nextBtn" aria-label="Suivant">
       <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
     </div>
   </div>
@@ -384,45 +422,31 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="videoModal">
-  <div class="modal-content">
-    <button class="close-modal" id="closeModalBtn" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
-    <video class="modal-video" id="modalVideo" controls playsinline></video>
-  </div>
-</div>
-
 <script>
   (function(){
     "use strict";
 
-    // Using the specified video link and additional working videos
     const PRIMARY_VIDEO = "https://cdn4.fireworktv.com/medias/2025/7/17/1752786430-vxnpiocm/watermarked/720/Kehaulanisanares_glossylipkits_ugc_paid_text.mp4";
     
-   const UGC_VIDEOS = [
-      { influencer: "Kehaulani S.", rating: "★★★★★", src: PRIMARY_VIDEO },
-      { influencer: "Dr. Anya", rating: "★★★★★", src: "video.mp4" },
-      { influencer: "Sofia K.", rating: "★★★★★", src: PRIMARY_VIDEO },
-      { influencer: "Elena M.", rating: "★★★★★", src: PRIMARY_VIDEO },
-      { influencer: "Nia Glow", rating: "★★★★★", src: PRIMARY_VIDEO },
-      { influencer: "Dr. L. Chen", rating: "★★★★★", src: PRIMARY_VIDEO },
-      { influencer: "Marie Claire", rating: "★★★★★", src: "video.mp4" }
+    const UGC_VIDEOS = [
+      { influencer: "Kehaulani S.", instagram: "kehaulani.glow", rating: "★★★★★", src: PRIMARY_VIDEO, verified: true },
+      { influencer: "Dr. Anya", instagram: "dr.anya.derm", rating: "★★★★★", src: "https://videos.pexels.com/video-files/7989732/7989732-hd_1080_1920_30fps.mp4", verified: true },
+      { influencer: "Sofia K.", instagram: "sofia.glowup", rating: "★★★★★", src: "https://videos.pexels.com/video-files/6963744/6963744-hd_1080_1920_30fps.mp4", verified: true },
+      { influencer: "Elena M.", instagram: "elena.beauty", rating: "★★★★★", src: PRIMARY_VIDEO, verified: true },
+      { influencer: "Nia Glow", instagram: "niaglow", rating: "★★★★★", src: "https://videos.pexels.com/video-files/7946079/7946079-hd_1080_1920_25fps.mp4", verified: true },
+      { influencer: "Dr. L. Chen", instagram: "dr.chen.derm", rating: "★★★★★", src: PRIMARY_VIDEO, verified: true },
+      { influencer: "Marie Claire", instagram: "marieclaire.beauty", rating: "★★★★★", src: "https://videos.pexels.com/video-files/7989732/7989732-hd_1080_1920_30fps.mp4", verified: true }
     ];
-    
 
     const track = document.getElementById('carouselTrack');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const progressFill = document.getElementById('progressFill');
-    const modalOverlay = document.getElementById('videoModal');
-    const modalVideo = document.getElementById('modalVideo');
-    const closeModalBtn = document.getElementById('closeModalBtn');
 
     let slides = [];
     let currentIndex = 0;
     let itemWidth = 0;
-    let gap = 16;
+    let gap = 12;
     let autoplayInterval = null;
     let progressInterval = null;
     let progressWidth = 0;
@@ -434,6 +458,7 @@
     let isHovering = false;
     let infiniteExtras = 0;
     let observer = null;
+    let currentlyPlayingVideo = null;
 
     function getCardWidth() {
       const firstCard = track.querySelector('.ugc-card');
@@ -446,9 +471,82 @@
       const cardEl = track.querySelector('.ugc-card');
       if (!cardEl) return;
       const style = window.getComputedStyle(track);
-      const gapValue = parseFloat(style.columnGap) || parseFloat(style.gap) || 16;
-      gap = isNaN(gapValue) ? 16 : gapValue;
+      const gapValue = parseFloat(style.columnGap) || parseFloat(style.gap) || 12;
+      gap = isNaN(gapValue) ? 12 : gapValue;
       itemWidth = cardEl.getBoundingClientRect().width + gap;
+    }
+
+    function stopCurrentlyPlaying() {
+      if (currentlyPlayingVideo) {
+        currentlyPlayingVideo.pause();
+        currentlyPlayingVideo.currentTime = 0;
+        currentlyPlayingVideo.muted = true;
+        const wrapper = currentlyPlayingVideo.closest('.video-wrapper');
+        if (wrapper) {
+          wrapper.classList.remove('playing');
+          updateControlButton(wrapper, false);
+        }
+        currentlyPlayingVideo = null;
+      }
+    }
+
+    function updateControlButton(wrapper, isPlaying) {
+      const playPauseBtn = wrapper.querySelector('.play-pause-btn');
+      if (playPauseBtn) {
+        playPauseBtn.innerHTML = isPlaying ? 
+          '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>' :
+          '<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+      }
+    }
+
+    function handleVideoPlay(video, wrapper) {
+      if (currentlyPlayingVideo && currentlyPlayingVideo !== video) {
+        stopCurrentlyPlaying();
+      }
+      
+      video.muted = false;
+      video.play().then(() => {
+        wrapper.classList.add('playing');
+        updateControlButton(wrapper, true);
+        currentlyPlayingVideo = video;
+        stopAutoplay();
+      }).catch(err => {
+        console.log('Playback failed:', err);
+      });
+    }
+
+    function handleVideoPause(video, wrapper) {
+      video.pause();
+      wrapper.classList.remove('playing');
+      updateControlButton(wrapper, false);
+      if (currentlyPlayingVideo === video) {
+        currentlyPlayingVideo = null;
+        startAutoplay();
+      }
+    }
+
+    function handleVideoEnded(video, wrapper) {
+      wrapper.classList.remove('playing');
+      updateControlButton(wrapper, false);
+      if (currentlyPlayingVideo === video) {
+        currentlyPlayingVideo = null;
+        startAutoplay();
+      }
+    }
+
+    function toggleMute(video, muteBtn) {
+      video.muted = !video.muted;
+      muteBtn.innerHTML = video.muted ? 
+        '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>' :
+        '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+    }
+
+    function requestFullscreen(video) {
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if (video.webkitRequestFullscreen) {
+        video.webkitRequestFullscreen();
+      }
     }
 
     function buildCards() {
@@ -472,28 +570,118 @@
         video.setAttribute('preload', 'metadata');
         video.setAttribute('data-loaded', 'false');
         video.crossOrigin = 'anonymous';
+        video.loop = false;
 
-        const overlay = document.createElement('div');
-        overlay.className = 'play-overlay';
-        overlay.innerHTML = `<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+        // Influencer overlay (bottom center)
+        const influencerOverlay = document.createElement('div');
+        influencerOverlay.className = 'influencer-overlay';
+        influencerOverlay.innerHTML = `
+          <div class="influencer-row-overlay">
+            <span class="ig-icon-link-overlay">
+              <span class="ig-icon-overlay">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                </svg>
+              </span>
+            </span>
+            <div class="influencer-name-wrapper-overlay">
+              <span class="influencer-name-overlay">${item.influencer}</span>
+              ${item.verified ? `
+                <span class="verified-badge-overlay">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                </span>
+              ` : ''}
+            </div>
+          </div>
+          <div class="rating-overlay">${item.rating}</div>
+        `;
+
+        // Controls overlay
+        const controlsOverlay = document.createElement('div');
+        controlsOverlay.className = 'video-controls-overlay';
+        controlsOverlay.innerHTML = `
+          <div class="control-group">
+            <div class="control-btn play-pause-btn">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="control-btn mute-btn">
+              <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            </div>
+          </div>
+          <div class="control-btn fullscreen-btn">
+            <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+          </div>
+        `;
+
+        // Play overlay
+        const playOverlay = document.createElement('div');
+        playOverlay.className = 'play-overlay';
+        playOverlay.innerHTML = `<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
 
         wrapper.appendChild(video);
-        wrapper.appendChild(overlay);
+        wrapper.appendChild(influencerOverlay);
+        wrapper.appendChild(controlsOverlay);
+        wrapper.appendChild(playOverlay);
         card.appendChild(wrapper);
-
-        const meta = document.createElement('div');
-        meta.className = 'card-meta';
-        meta.innerHTML = `
-          <span class="influencer">${item.influencer}</span>
-          <span class="rating">${item.rating}</span>
-        `;
-        card.appendChild(meta);
+        
         fragment.appendChild(card);
       });
 
       track.appendChild(fragment);
       slides = [...document.querySelectorAll('.ugc-card')];
+      
+      attachVideoListeners();
       cloneForInfinite();
+    }
+
+    function attachVideoListeners() {
+      document.querySelectorAll('.video-wrapper').forEach(wrapper => {
+        const video = wrapper.querySelector('.ugc-video');
+        const playPauseBtn = wrapper.querySelector('.play-pause-btn');
+        const muteBtn = wrapper.querySelector('.mute-btn');
+        const fullscreenBtn = wrapper.querySelector('.fullscreen-btn');
+
+        const togglePlay = () => {
+          if (video.paused) {
+            handleVideoPlay(video, wrapper);
+          } else {
+            handleVideoPause(video, wrapper);
+          }
+        };
+
+        playPauseBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          togglePlay();
+        });
+
+        wrapper.addEventListener('click', (e) => {
+          if (!e.target.closest('.control-btn')) {
+            togglePlay();
+          }
+        });
+
+        muteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleMute(video, muteBtn);
+        });
+
+        fullscreenBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          requestFullscreen(video);
+        });
+
+        video.addEventListener('ended', () => {
+          handleVideoEnded(video, wrapper);
+        });
+
+        video.addEventListener('volumechange', () => {
+          muteBtn.innerHTML = video.muted ? 
+            '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>' :
+            '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+        });
+      });
     }
 
     function cloneForInfinite() {
@@ -524,6 +712,8 @@
       
       slides = [...track.querySelectorAll('.ugc-card')];
       infiniteExtras = clonesBefore;
+      
+      attachVideoListeners();
     }
 
     function setTransformPosition(indexWithOffset) {
@@ -545,6 +735,8 @@
       startProgressTimer();
       
       setTimeout(() => lazyLoadVisible(), 60);
+      
+      stopCurrentlyPlaying();
     }
 
     function nextSlide() {
@@ -558,7 +750,7 @@
     function startAutoplay() {
       stopAutoplay();
       autoplayInterval = setInterval(() => {
-        if (isDragging || isHovering) return;
+        if (isDragging || isHovering || currentlyPlayingVideo) return;
         nextSlide();
       }, 6000);
     }
@@ -582,7 +774,7 @@
       const increment = 100 / (totalTime / stepTime);
       
       progressInterval = setInterval(() => {
-        if (isDragging || isHovering) return;
+        if (isDragging || isHovering || currentlyPlayingVideo) return;
         progressWidth = Math.min(100, progressWidth + increment);
         progressFill.style.width = progressWidth + '%';
         if (progressWidth >= 100) {
@@ -631,24 +823,6 @@
           observer.observe(video);
         }
       });
-    }
-
-    function openModal(videoSrc) {
-      modalVideo.src = videoSrc;
-      modalVideo.muted = false;
-      modalVideo.playsInline = false;
-      modalVideo.controls = true;
-      modalOverlay.classList.add('active');
-      
-      modalVideo.play().catch(err => {
-        console.log('Autoplay prevented, user interaction needed');
-      });
-    }
-
-    function closeModal() {
-      modalOverlay.classList.remove('active');
-      modalVideo.pause();
-      modalVideo.src = '';
     }
 
     function handleDragStart(e) {
@@ -723,18 +897,6 @@
       
       track.addEventListener('dragstart', (e) => e.preventDefault());
       
-      track.addEventListener('click', (e) => {
-        const wrapper = e.target.closest('.video-wrapper');
-        if (!wrapper) return;
-        const src = wrapper.dataset.videoSrc;
-        if (src) openModal(src);
-      });
-      
-      closeModalBtn.addEventListener('click', closeModal);
-      modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) closeModal();
-      });
-      
       window.addEventListener('resize', () => {
         updateDimensions();
         goToLogicalIndex(currentIndex, false);
@@ -747,12 +909,6 @@
         const wrapped = ((logical % UGC_VIDEOS.length) + UGC_VIDEOS.length) % UGC_VIDEOS.length;
         if (wrapped !== currentIndex) {
           goToLogicalIndex(wrapped, false);
-        }
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-          closeModal();
         }
       });
     }
