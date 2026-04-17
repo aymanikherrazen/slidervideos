@@ -1,935 +1,546 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>Derm UGC · Reels Slider</title>
-  <!-- Poppins Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luminelle — UGC</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#083D77;--blue:#2bb3f3;--gap:14px}
+body{background:#fff;font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased}
 
-    body {
-      background: #3bb3f3;
-      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 0;
-      color: #1e1e1e;
-      -webkit-font-smoothing: antialiased;
-    }
+/* ── SECTION ── */
+.ugc{
+  width:100%;
+  background:#2bb3f3;
+  padding:40px 0 44px;
+  overflow:hidden;
+}
 
-    .ugc-showcase {
-      max-width: 1280px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 0;
-    }
+/* ── WHITE CARD WRAPPER ── */
+.ugc-inner{
+  max-width:1100px;
+  margin:0 auto;
+  background:#fff;
+  border-radius:20px;
+  padding:28px 20px 24px;
+  mx:16px;
+  margin-left:16px;
+  margin-right:16px;
+}
 
-    .section-title {
-      font-weight: 600;
-      font-size: 1.8rem;
-      letter-spacing: -0.02em;
-      margin-bottom: 0;
-      padding: 0 0 0 0.25rem;
-      color: #1a1a1a;
-      font-family: 'Poppins', sans-serif;
-      line-height: 1.2;
-    }
+/* ── VIEWPORT ── */
+.ugc-viewport{
+  position:relative;
+  overflow:hidden;
+  touch-action:pan-y;
+}
 
-    .section-title span {
-      font-weight: 300;
-      color: #5a5a5a;
-    }
+/* ── TRACK ── */
+.ugc-track{
+  display:flex;
+  gap:var(--gap);
+  will-change:transform;
+  transition:transform .8s cubic-bezier(.25,.1,.25,1);
+}
+.ugc-track.no-transition{transition:none}
 
-    .slider-container {
-      position: relative;
-      width: 100%;
-      user-select: none;
-      -webkit-user-select: none;
-      margin-bottom: 0;
-      background: #2bb3f3;
-      border-radius: 0;
-      padding: 12px 0 8px;
-    }
+/* ── CARD ── */
+.ugc-card{
+  flex-shrink:0;
+  border-radius:14px;
+  overflow:hidden;
+  position:relative;
+  background:#000;
+  aspect-ratio:9/16;
+}
 
-    .carousel-viewport {
-      overflow: hidden;
-      width: 100%;
-    }
+/* ── VIDEO ── */
+.ugc-video{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+  pointer-events:none;
+}
 
-    .carousel-track {
-      display: flex;
-      gap: 12px;
-      will-change: transform;
-      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      transform: translateX(0);
-      cursor: grab;
-      padding: 4px 8px;
-    }
+/* ── GRADIENT ── */
+.ugc-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(0,0,0,.85) 0%,
+    rgba(0,0,0,.1) 50%,
+    transparent 70%
+  );
+  z-index:1;pointer-events:none;
+}
 
-    .carousel-track.dragging {
-      transition: none;
-      cursor: grabbing;
-    }
+/* ── INSTAGRAM BADGE OVERLAY (top left) ── */
+.ugc-ig{
+  position:absolute;top:10px;left:10px;
+  z-index:3;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);
+  border-radius:20px;
+  padding:4px 10px 4px 4px;
+}
+.ugc-ig-avatar{
+  width:26px;height:26px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.5);
+  object-fit:cover;background:#2bb3f3;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;color:#fff;
+  flex-shrink:0;overflow:hidden;
+}
+.ugc-ig-name{font-size:10px;font-weight:600;color:#fff;white-space:nowrap}
+.ugc-ig-badge{
+  width:14px;height:14px;flex-shrink:0;
+}
 
-    .ugc-card {
-      flex: 0 0 calc((100% - 24px) / 3);
-      max-width: calc((100% - 24px) / 3);
-      background: transparent;
-      border-radius: 16px;
-      transition: transform 0.2s ease;
-      overflow: visible;
-      display: flex;
-      flex-direction: column;
-    }
+/* ── BIG PLAY BUTTON (center) ── */
+.ugc-play-btn{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:3;
+  width:52px;height:52px;
+  border-radius:50%;
+  background:rgba(255,255,255,.25);
+  backdrop-filter:blur(10px);
+  border:2px solid rgba(255,255,255,.6);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s,background .2s;
+}
+.ugc-play-btn:hover{background:rgba(255,255,255,.4);transform:translate(-50%,-50%) scale(1.08)}
+.ugc-play-btn svg{width:18px;height:18px;fill:#fff;margin-left:3px}
+.ugc-card.playing .ugc-play-btn{display:none}
 
-    .ugc-card:hover {
-      transform: translateY(-2px);
-    }
+/* ── INLINE CONTROLS (shown when playing) ── */
+.ugc-controls{
+  position:absolute;bottom:0;left:0;right:0;
+  z-index:4;
+  padding:10px 12px 12px;
+  display:none;
+  flex-direction:column;
+  gap:6px;
+}
+.ugc-card.playing .ugc-controls{display:flex}
+.ugc-ctrl-row{display:flex;align-items:center;justify-content:space-between}
+.ugc-ctrl-left{display:flex;align-items:center;gap:8px}
 
-    .video-wrapper {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 9 / 16;
-      max-height: 320px;
-      min-height: 280px;
-      background: #000;
-      border-radius: 14px;
-      overflow: hidden;
-      cursor: pointer;
-      border: 1.5px solid white;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+/* ── PROGRESS LINE ── */
+.ugc-vid-prog{
+  width:100%;height:2px;
+  background:rgba(255,255,255,.3);
+  border-radius:2px;overflow:hidden;
+}
+.ugc-vid-prog-fill{
+  height:100%;width:0%;
+  background:#fff;
+  border-radius:2px;
+  transition:none;
+}
 
-    .ugc-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      background: #000;
-    }
+.ugc-cb{
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+  backdrop-filter:blur(8px);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;
+  flex-shrink:0;
+}
+.ugc-cb:hover{background:rgba(255,255,255,.35)}
+.ugc-cb svg{width:13px;height:13px;fill:#fff;stroke:none}
+.ugc-cb.stroke svg{fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-    /* Video Controls Overlay */
-    .video-controls-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
-      padding: 40px 12px 12px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      pointer-events: none;
-    }
+/* ── META (bottom) ── */
+.ugc-meta{
+  position:absolute;bottom:52px;left:12px;right:12px;
+  z-index:3;pointer-events:none;
+}
+.ugc-card.playing .ugc-meta{bottom:78px}
+.ugc-stars{display:flex;gap:2px;margin-bottom:3px}
+.ugc-stars svg{width:10px;height:10px;fill:#FFD700}
+.ugc-uname{font-size:11px;font-weight:600;color:#fff;letter-spacing:.01em;text-shadow:0 1px 4px rgba(0,0,0,.6)}
 
-    .video-wrapper:hover .video-controls-overlay,
-    .video-wrapper.playing .video-controls-overlay {
-      opacity: 1;
-      pointer-events: auto;
-    }
+/* ── ARROWS ── */
+.ugc-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.9);
+  border:none;cursor:pointer;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.12);
+  transition:background .2s,transform .15s;
+}
+.ugc-arrow:hover{background:#fff;transform:translateY(-50%) scale(1.06)}
+.ugc-arrow svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.ugc-prev{left:-42px}.ugc-next{right:-42px}
+@media(max-width:640px){.ugc-arrow{display:none}}
 
-    .control-btn {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      color: white;
-    }
+/* ── PROGRESS BAR ── */
+.ugc-prog-wrap{
+  height:2px;background:rgba(43,179,243,.2);
+  border-radius:2px;margin-top:16px;overflow:hidden;
+}
+.ugc-prog-bar{height:100%;width:0%;background:var(--navy);border-radius:2px}
 
-    .control-btn:hover {
-      background: rgba(255, 255, 255, 0.25);
-      transform: scale(1.08);
-    }
-
-    .control-btn svg {
-      width: 18px;
-      height: 18px;
-      fill: white;
-      stroke: white;
-    }
-
-    .control-group {
-      display: flex;
-      gap: 8px;
-    }
-
-    /* Play overlay (centered) */
-    .play-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 56px;
-      height: 56px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(4px);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
-      pointer-events: none;
-      border: 2px solid white;
-      opacity: 1;
-    }
-
-    .video-wrapper.playing .play-overlay {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.8);
-    }
-
-    .play-overlay svg {
-      width: 26px;
-      height: 26px;
-      fill: #083d77;
-      margin-left: 3px;
-    }
-
-    /* Influencer info overlay - centered */
-    .influencer-overlay {
-      position: absolute;
-      bottom: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-      color: white;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-      pointer-events: none;
-      z-index: 5;
-      opacity: 1;
-      transition: opacity 0.3s ease;
-      width: 90%;
-    }
-
-    .video-wrapper.playing .influencer-overlay {
-      opacity: 0;
-    }
-
-    .influencer-row-overlay {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-
-    .ig-icon-link-overlay {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .ig-icon-overlay {
-      width: 24px;
-      height: 24px;
-      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .ig-icon-overlay svg {
-      width: 14px;
-      height: 14px;
-      fill: white;
-    }
-
-    .influencer-name-wrapper-overlay {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .influencer-name-overlay {
-      font-size: 1.1rem;
-      font-weight: 600;
-      font-family: 'Poppins', sans-serif;
-      white-space: nowrap;
-    }
-
-    .verified-badge-overlay {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      background: #0095f6;
-      border-radius: 50%;
-      border: 2px solid white;
-    }
-
-    .verified-badge-overlay svg {
-      width: 10px;
-      height: 10px;
-      fill: white;
-    }
-
-    /* Rating stars - below influencer */
-    .rating-overlay {
-      color: #FFD700;
-      font-size: 1.1rem;
-      letter-spacing: 3px;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-      white-space: nowrap;
-      line-height: 1.4;
-    }
-
-    /* Progress bar */
-    .progress-container {
-      width: 100%;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.3);
-      overflow: hidden;
-      margin-top: 4px;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: #083d77;
-      transition: width 0.1s linear;
-      will-change: width;
-    }
-
-    /* Arrow buttons */
-    .slider-btn {
-      position: absolute;
-      top: calc(50% - 28px);
-      transform: translateY(-50%);
-      width: 44px;
-      height: 44px;
-      background: #083d77;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border-radius: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1.5px solid white;
-      color: white;
-      cursor: pointer;
-      z-index: 10;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(8, 61, 119, 0.3);
-    }
-
-    .slider-btn:hover {
-      background: #0a4a8a;
-      transform: translateY(-50%) scale(1.05);
-      box-shadow: 0 6px 16px rgba(8, 61, 119, 0.4);
-    }
-
-    .slider-btn:active {
-      transform: translateY(-50%) scale(0.95);
-    }
-
-    .slider-btn svg {
-      width: 22px;
-      height: 22px;
-      fill: none;
-      stroke: white;
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .btn-left {
-      left: 12px;
-    }
-
-    .btn-right {
-      right: 12px;
-    }
-
-    /* Mobile responsive */
-    @media (max-width: 680px) {
-      .ugc-card {
-        flex: 0 0 calc((100% - 12px) / 2);
-        max-width: calc((100% - 12px) / 2);
-      }
-      .carousel-track {
-        gap: 8px;
-      }
-      .slider-btn {
-        width: 40px;
-        height: 40px;
-      }
-      .section-title {
-        font-size: 1.5rem;
-        padding-left: 8px;
-      }
-      .slider-container {
-        padding: 8px 0 6px;
-      }
-      .influencer-name-overlay {
-        font-size: 0.95rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .video-wrapper {
-        max-height: 300px;
-        min-height: 260px;
-      }
-      .influencer-overlay {
-        bottom: 60px;
-      }
-    }
-  </style>
+/* ── MOBILE: prevent vertical scroll on track ── */
+@media(max-width:640px){
+  .ugc-inner{padding:20px 12px 18px;border-radius:16px}
+  .ugc-viewport{touch-action:pan-x}
+}
+</style>
 </head>
 <body>
-<div class="ugc-showcase">
 
-  <div class="slider-container" id="ugcSlider">
-    <div class="carousel-viewport">
-      <div class="carousel-track" id="carouselTrack"></div>
-    </div>
+<section class="ugc">
+  <div class="ugc-inner">
 
-    <div class="slider-btn btn-left" id="prevBtn" aria-label="Précédent">
-      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-    </div>
-    <div class="slider-btn btn-right" id="nextBtn" aria-label="Suivant">
-      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    <div style="position:relative">
+      <button class="ugc-arrow ugc-prev" id="ugcPrev">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="ugc-arrow ugc-next" id="ugcNext">
+        <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+
+      <div class="ugc-viewport" id="ugcVP">
+        <div class="ugc-track" id="ugcTrack">
+
+          <!-- CARD 1 -->
+          <div class="ugc-card" data-src="https://cdn4.fireworktv.com/medias/2025/7/17/1752786430-vxnpiocm/watermarked/720/Kehaulanisanares_glossylipkits_ugc_paid_text.mp4">
+            <video class="ugc-video" preload="metadata" playsinline controlsList="nodownload" disablePictureInPicture oncontextmenu="return false"></video>
+            <div class="ugc-grad"></div>
+            <div class="ugc-ig">
+              <div class="ugc-ig-avatar">S</div>
+              <span class="ugc-ig-name">@salma.skin</span>
+              <svg class="ugc-ig-badge" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#1877F2"/><polyline points="6.5 11.5 9.5 14.5 15.5 8.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <button class="ugc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+            <div class="ugc-meta">
+              <div class="ugc-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+              <div class="ugc-uname">@salma.skin</div>
+            </div>
+            <div class="ugc-controls">
+              <div class="ugc-vid-prog"><div class="ugc-vid-prog-fill"></div></div>
+              <div class="ugc-ctrl-row">
+                <div class="ugc-ctrl-left">
+                  <button class="ugc-cb ugc-pp"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+                  <button class="ugc-cb ugc-mu stroke"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></button>
+                </div>
+                <button class="ugc-cb ugc-fs stroke"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2 -->
+          <div class="ugc-card" data-src="https://cdn4.fireworktv.com/medias/2025/7/17/1752786430-vxnpiocm/watermarked/720/Kehaulanisanares_glossylipkits_ugc_paid_text.mp4">
+            <video class="ugc-video" preload="metadata" playsinline controlsList="nodownload" disablePictureInPicture oncontextmenu="return false"></video>
+            <div class="ugc-grad"></div>
+            <div class="ugc-ig">
+              <div class="ugc-ig-avatar">N</div>
+              <span class="ugc-ig-name">@nadia_beauty</span>
+              <svg class="ugc-ig-badge" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#1877F2"/><polyline points="6.5 11.5 9.5 14.5 15.5 8.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <button class="ugc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+            <div class="ugc-meta">
+              <div class="ugc-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+              <div class="ugc-uname">@nadia_beauty</div>
+            </div>
+            <div class="ugc-controls">
+              <div class="ugc-vid-prog"><div class="ugc-vid-prog-fill"></div></div>
+              <div class="ugc-ctrl-row">
+                <div class="ugc-ctrl-left">
+                  <button class="ugc-cb ugc-pp"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+                  <button class="ugc-cb ugc-mu stroke"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></button>
+                </div>
+                <button class="ugc-cb ugc-fs stroke"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 3 -->
+          <div class="ugc-card" data-src="https://cdn4.fireworktv.com/medias/2025/7/17/1752786430-vxnpiocm/watermarked/720/Kehaulanisanares_glossylipkits_ugc_paid_text.mp4">
+            <video class="ugc-video" preload="metadata" playsinline controlsList="nodownload" disablePictureInPicture oncontextmenu="return false"></video>
+            <div class="ugc-grad"></div>
+            <div class="ugc-ig">
+              <div class="ugc-ig-avatar">M</div>
+              <span class="ugc-ig-name">@meriem.glow</span>
+              <svg class="ugc-ig-badge" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#1877F2"/><polyline points="6.5 11.5 9.5 14.5 15.5 8.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <button class="ugc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+            <div class="ugc-meta">
+              <div class="ugc-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+              <div class="ugc-uname">@meriem.glow</div>
+            </div>
+            <div class="ugc-controls">
+              <div class="ugc-vid-prog"><div class="ugc-vid-prog-fill"></div></div>
+              <div class="ugc-ctrl-row">
+                <div class="ugc-ctrl-left">
+                  <button class="ugc-cb ugc-pp"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+                  <button class="ugc-cb ugc-mu stroke"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></button>
+                </div>
+                <button class="ugc-cb ugc-fs stroke"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 4 -->
+          <div class="ugc-card" data-src="https://cdn4.fireworktv.com/medias/2025/7/17/1752786430-vxnpiocm/watermarked/720/Kehaulanisanares_glossylipkits_ugc_paid_text.mp4">
+            <video class="ugc-video" preload="metadata" playsinline controlsList="nodownload" disablePictureInPicture oncontextmenu="return false"></video>
+            <div class="ugc-grad"></div>
+            <div class="ugc-ig">
+              <div class="ugc-ig-avatar">H</div>
+              <span class="ugc-ig-name">@hajar.skin</span>
+              <svg class="ugc-ig-badge" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#1877F2"/><polyline points="6.5 11.5 9.5 14.5 15.5 8.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <button class="ugc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+            <div class="ugc-meta">
+              <div class="ugc-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+              <div class="ugc-uname">@hajar.skin</div>
+            </div>
+            <div class="ugc-controls">
+              <div class="ugc-vid-prog"><div class="ugc-vid-prog-fill"></div></div>
+              <div class="ugc-ctrl-row">
+                <div class="ugc-ctrl-left">
+                  <button class="ugc-cb ugc-pp"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+                  <button class="ugc-cb ugc-mu stroke"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></button>
+                </div>
+                <button class="ugc-cb ugc-fs stroke"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 5 -->
+          <div class="ugc-card" data-src="https://cdn4.fireworktv.com/medias/2025/7/17/1752786430-vxnpiocm/watermarked/720/Kehaulanisanares_glossylipkits_ugc_paid_text.mp4">
+            <video class="ugc-video" preload="metadata" playsinline controlsList="nodownload" disablePictureInPicture oncontextmenu="return false"></video>
+            <div class="ugc-grad"></div>
+            <div class="ugc-ig">
+              <div class="ugc-ig-avatar">Y</div>
+              <span class="ugc-ig-name">@yousra.beauty</span>
+              <svg class="ugc-ig-badge" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#1877F2"/><polyline points="6.5 11.5 9.5 14.5 15.5 8.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <button class="ugc-play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+            <div class="ugc-meta">
+              <div class="ugc-stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+              <div class="ugc-uname">@yousra.beauty</div>
+            </div>
+            <div class="ugc-controls">
+              <div class="ugc-vid-prog"><div class="ugc-vid-prog-fill"></div></div>
+              <div class="ugc-ctrl-row">
+                <div class="ugc-ctrl-left">
+                  <button class="ugc-cb ugc-pp"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+                  <button class="ugc-cb ugc-mu stroke"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></button>
+                </div>
+                <button class="ugc-cb ugc-fs stroke"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PROGRESS BAR -->
+      <div class="ugc-prog-wrap">
+        <div class="ugc-prog-bar" id="ugcBar"></div>
+      </div>
+
     </div>
   </div>
-
-  <div class="progress-container" id="progressBarContainer">
-    <div class="progress-fill" id="progressFill"></div>
-  </div>
-</div>
+</section>
 
 <script>
-  (function(){
-    "use strict";
+!function(){
+'use strict';
+var GAP=14,DURATION=7000;
+var track=document.getElementById('ugcTrack');
+var vp=document.getElementById('ugcVP');
+var bar=document.getElementById('ugcBar');
+var cards=[].slice.call(document.querySelectorAll('.ugc-card'));
+var n=cards.length;
+var cur=0,hovered=false,autoT=null,progRAF=null,progT=null;
+var playIcon='<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+var pauseIcon='<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+var muteIcon='<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+var soundIcon='<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
 
-    const PRIMARY_VIDEO = "https://cdn4.fireworktv.com/medias/2025/7/17/1752786430-vxnpiocm/watermarked/720/Kehaulanisanares_glossylipkits_ugc_paid_text.mp4";
-    
-    const UGC_VIDEOS = [
-      { influencer: "Kehaulani S.", instagram: "kehaulani.glow", rating: "★★★★★", src: PRIMARY_VIDEO, verified: true },
-      { influencer: "Dr. Anya", instagram: "dr.anya.derm", rating: "★★★★★", src: "https://videos.pexels.com/video-files/7989732/7989732-hd_1080_1920_30fps.mp4", verified: true },
-      { influencer: "Sofia K.", instagram: "sofia.glowup", rating: "★★★★★", src: "https://videos.pexels.com/video-files/6963744/6963744-hd_1080_1920_30fps.mp4", verified: true },
-      { influencer: "Elena M.", instagram: "elena.beauty", rating: "★★★★★", src: PRIMARY_VIDEO, verified: true },
-      { influencer: "Nia Glow", instagram: "niaglow", rating: "★★★★★", src: "https://videos.pexels.com/video-files/7946079/7946079-hd_1080_1920_25fps.mp4", verified: true },
-      { influencer: "Dr. L. Chen", instagram: "dr.chen.derm", rating: "★★★★★", src: PRIMARY_VIDEO, verified: true },
-      { influencer: "Marie Claire", instagram: "marieclaire.beauty", rating: "★★★★★", src: "https://videos.pexels.com/video-files/7989732/7989732-hd_1080_1920_30fps.mp4", verified: true }
-    ];
-
-    const track = document.getElementById('carouselTrack');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const progressFill = document.getElementById('progressFill');
-
-    let slides = [];
-    let currentIndex = 0;
-    let itemWidth = 0;
-    let gap = 12;
-    let autoplayInterval = null;
-    let progressInterval = null;
-    let progressWidth = 0;
-    let isDragging = false;
-    let startX = 0;
-    let currentTranslate = 0;
-    let prevTranslate = 0;
-    let dragStartTime = 0;
-    let isHovering = false;
-    let infiniteExtras = 0;
-    let observer = null;
-    let currentlyPlayingVideo = null;
-
-    function getCardWidth() {
-      const firstCard = track.querySelector('.ugc-card');
-      if (!firstCard) return 300;
-      return firstCard.getBoundingClientRect().width + gap;
+/* ── LAZY LOAD ── */
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(e.isIntersecting){
+      var c=e.target,vid=c.querySelector('video');
+      if(!vid.src){vid.src=c.getAttribute('data-src');vid.load();}
+      io.unobserve(c);
     }
+  });
+},{rootMargin:'80px'});
+cards.forEach(function(c){io.observe(c)});
 
-    function updateDimensions() {
-      if (slides.length === 0) return;
-      const cardEl = track.querySelector('.ugc-card');
-      if (!cardEl) return;
-      const style = window.getComputedStyle(track);
-      const gapValue = parseFloat(style.columnGap) || parseFloat(style.gap) || 12;
-      gap = isNaN(gapValue) ? 12 : gapValue;
-      itemWidth = cardEl.getBoundingClientRect().width + gap;
-    }
+/* ── SIZING ── */
+function pv(){return window.innerWidth<=640?2:3}
+function cw(){var w=vp.offsetWidth;return(w-(pv()-1)*GAP)/pv();}
+function setW(){var v=cw();cards.forEach(function(c){c.style.width=v+'px'});}
 
-    function stopCurrentlyPlaying() {
-      if (currentlyPlayingVideo) {
-        currentlyPlayingVideo.pause();
-        currentlyPlayingVideo.currentTime = 0;
-        currentlyPlayingVideo.muted = true;
-        const wrapper = currentlyPlayingVideo.closest('.video-wrapper');
-        if (wrapper) {
-          wrapper.classList.remove('playing');
-          updateControlButton(wrapper, false);
-        }
-        currentlyPlayingVideo = null;
-      }
-    }
+/* ── SLIDE ── */
+function maxI(){return Math.max(0,n-pv());}
+function goTo(i,skipProg){
+  cur=Math.min(Math.max(i,0),maxI());
+  track.style.transform='translateX(-'+(cur*(cw()+GAP))+'px)';
+  if(!skipProg)startProg();
+}
 
-    function updateControlButton(wrapper, isPlaying) {
-      const playPauseBtn = wrapper.querySelector('.play-pause-btn');
-      if (playPauseBtn) {
-        playPauseBtn.innerHTML = isPlaying ? 
-          '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>' :
-          '<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
-      }
-    }
+/* ── PROGRESS ── */
+function startProg(){
+  bar.style.transition='none';bar.style.width='0%';
+  cancelAnimationFrame(progRAF);clearTimeout(progT);
+  if(hovered)return;
+  var s=null;
+  function step(ts){
+    if(!s)s=ts;
+    var p=Math.min((ts-s)/DURATION*100,100);
+    bar.style.width=p+'%';
+    if(p<100){progRAF=requestAnimationFrame(step);}
+  }
+  progRAF=requestAnimationFrame(step);
+  progT=setTimeout(function(){if(!hovered)goTo(cur+1>maxI()?0:cur+1);},DURATION);
+}
+function stopProg(){cancelAnimationFrame(progRAF);clearTimeout(progT);bar.style.transition='none';bar.style.width='0%';}
 
-    function handleVideoPlay(video, wrapper) {
-      if (currentlyPlayingVideo && currentlyPlayingVideo !== video) {
-        stopCurrentlyPlaying();
-      }
-      
-      video.muted = false;
-      video.play().then(() => {
-        wrapper.classList.add('playing');
-        updateControlButton(wrapper, true);
-        currentlyPlayingVideo = video;
-        stopAutoplay();
-      }).catch(err => {
-        console.log('Playback failed:', err);
-      });
-    }
+/* ── HOVER ── */
+vp.addEventListener('mouseenter',function(){hovered=true;stopProg();});
+vp.addEventListener('mouseleave',function(){hovered=false;startProg();});
 
-    function handleVideoPause(video, wrapper) {
-      video.pause();
-      wrapper.classList.remove('playing');
-      updateControlButton(wrapper, false);
-      if (currentlyPlayingVideo === video) {
-        currentlyPlayingVideo = null;
-        startAutoplay();
-      }
-    }
+/* ── STOP ALL VIDEOS ── */
+function stopAll(except){
+  cards.forEach(function(c){
+    if(c===except)return;
+    var v=c.querySelector('video');
+    v.pause();v.currentTime=0;
+    c.classList.remove('playing');
+    var pp=c.querySelector('.ugc-pp');
+    if(pp)pp.innerHTML=playIcon;
+    var pf=c.querySelector('.ugc-vid-prog-fill');
+    if(pf){pf.style.width='0%';cancelAnimationFrame(c._raf);}
+  });
+}
 
-    function handleVideoEnded(video, wrapper) {
-      wrapper.classList.remove('playing');
-      updateControlButton(wrapper, false);
-      if (currentlyPlayingVideo === video) {
-        currentlyPlayingVideo = null;
-        startAutoplay();
-      }
-    }
+/* ── VIDEO PROGRESS UPDATE ── */
+function updateVidProg(card,vid){
+  var fill=card.querySelector('.ugc-vid-prog-fill');
+  if(!fill)return;
+  function tick(){
+    if(vid.paused||vid.ended)return;
+    fill.style.width=(vid.currentTime/vid.duration*100)+'%';
+    card._raf=requestAnimationFrame(tick);
+  }
+  cancelAnimationFrame(card._raf);
+  card._raf=requestAnimationFrame(tick);
+}
 
-    function toggleMute(video, muteBtn) {
-      video.muted = !video.muted;
-      muteBtn.innerHTML = video.muted ? 
-        '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>' :
-        '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
-    }
+/* ── PLAY BTN ── */
+cards.forEach(function(card){
+  var vid=card.querySelector('video');
+  var playBtn=card.querySelector('.ugc-play-btn');
+  var pp=card.querySelector('.ugc-pp');
+  var mu=card.querySelector('.ugc-mu');
+  var fs=card.querySelector('.ugc-fs');
+  var fill=card.querySelector('.ugc-vid-prog-fill');
 
-    function requestFullscreen(video) {
-      if (video.requestFullscreen) {
-        video.requestFullscreen();
-      } else if (video.webkitRequestFullscreen) {
-        video.webkitRequestFullscreen();
-      }
-    }
+  // big center play button
+  playBtn.addEventListener('click',function(){
+    if(!vid.src){vid.src=card.getAttribute('data-src');vid.load();}
+    stopAll(card);
+    vid.muted=false;
+    vid.play().catch(function(){vid.muted=true;vid.play();});
+    card.classList.add('playing');
+    pp.innerHTML=pauseIcon;
+    mu.innerHTML=soundIcon;
+    updateVidProg(card,vid);
+    stopProg();
+  });
 
-    function buildCards() {
-      track.innerHTML = '';
-      const fragment = document.createDocumentFragment();
-      
-      UGC_VIDEOS.forEach((item, idx) => {
-        const card = document.createElement('div');
-        card.className = 'ugc-card';
-        card.dataset.index = idx;
+  // play/pause toggle
+  pp.addEventListener('click',function(e){e.stopPropagation();
+    if(vid.paused){vid.play();pp.innerHTML=pauseIcon;updateVidProg(card,vid);}
+    else{vid.pause();pp.innerHTML=playIcon;}
+  });
 
-        const wrapper = document.createElement('div');
-        wrapper.className = 'video-wrapper';
-        wrapper.setAttribute('data-video-src', item.src);
+  // mute toggle
+  mu.addEventListener('click',function(e){e.stopPropagation();
+    vid.muted=!vid.muted;
+    mu.innerHTML=vid.muted?muteIcon:soundIcon;
+  });
 
-        const video = document.createElement('video');
-        video.className = 'ugc-video';
-        video.muted = true;
-        video.playsInline = true;
-        video.disableRemotePlayback = true;
-        video.setAttribute('preload', 'metadata');
-        video.setAttribute('data-loaded', 'false');
-        video.crossOrigin = 'anonymous';
-        video.loop = false;
+  // fullscreen
+  fs.addEventListener('click',function(e){e.stopPropagation();
+    if(vid.requestFullscreen)vid.requestFullscreen();
+    else if(vid.webkitEnterFullscreen)vid.webkitEnterFullscreen();
+  });
 
-        // Influencer overlay (bottom center)
-        const influencerOverlay = document.createElement('div');
-        influencerOverlay.className = 'influencer-overlay';
-        influencerOverlay.innerHTML = `
-          <div class="influencer-row-overlay">
-            <span class="ig-icon-link-overlay">
-              <span class="ig-icon-overlay">
-                <svg viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                </svg>
-              </span>
-            </span>
-            <div class="influencer-name-wrapper-overlay">
-              <span class="influencer-name-overlay">${item.influencer}</span>
-              ${item.verified ? `
-                <span class="verified-badge-overlay">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                </span>
-              ` : ''}
-            </div>
-          </div>
-          <div class="rating-overlay">${item.rating}</div>
-        `;
+  // video ended — stop, reset
+  vid.addEventListener('ended',function(){
+    card.classList.remove('playing');
+    pp.innerHTML=playIcon;
+    if(fill){fill.style.width='0%';cancelAnimationFrame(card._raf);}
+    startProg();
+  });
+});
 
-        // Controls overlay
-        const controlsOverlay = document.createElement('div');
-        controlsOverlay.className = 'video-controls-overlay';
-        controlsOverlay.innerHTML = `
-          <div class="control-group">
-            <div class="control-btn play-pause-btn">
-              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </div>
-            <div class="control-btn mute-btn">
-              <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-            </div>
-          </div>
-          <div class="control-btn fullscreen-btn">
-            <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-          </div>
-        `;
+/* ── ARROWS ── */
+document.getElementById('ugcPrev').addEventListener('click',function(){stopAll();goTo(cur-1);});
+document.getElementById('ugcNext').addEventListener('click',function(){stopAll();goTo(cur+1>maxI()?0:cur+1);});
 
-        // Play overlay
-        const playOverlay = document.createElement('div');
-        playOverlay.className = 'play-overlay';
-        playOverlay.innerHTML = `<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+/* ── TOUCH SWIPE (horizontal only, allow vertical scroll) ── */
+var tx=0,ty=0,moved=false,hScroll=false;
+vp.addEventListener('touchstart',function(e){
+  tx=e.touches[0].clientX;ty=e.touches[0].clientY;moved=false;hScroll=false;
+},{passive:true});
+vp.addEventListener('touchmove',function(e){
+  var dx=Math.abs(e.touches[0].clientX-tx);
+  var dy=Math.abs(e.touches[0].clientY-ty);
+  if(!moved){
+    if(dx>dy&&dx>8){hScroll=true;}
+    moved=true;
+  }
+  if(hScroll){e.preventDefault();}
+},{passive:false});
+vp.addEventListener('touchend',function(e){
+  if(!hScroll)return;
+  var dx=tx-e.changedTouches[0].clientX;
+  if(Math.abs(dx)>50){stopAll();goTo(dx>0?cur+1:cur-1);}
+},{passive:true});
 
-        wrapper.appendChild(video);
-        wrapper.appendChild(influencerOverlay);
-        wrapper.appendChild(controlsOverlay);
-        wrapper.appendChild(playOverlay);
-        card.appendChild(wrapper);
-        
-        fragment.appendChild(card);
-      });
+/* ── MOUSE DRAG ── */
+var mx=0,dragging=false,didDrag=false;
+vp.addEventListener('mousedown',function(e){mx=e.clientX;dragging=true;didDrag=false;stopProg();});
+window.addEventListener('mousemove',function(e){
+  if(!dragging)return;
+  if(Math.abs(e.clientX-mx)>6)didDrag=true;
+  track.classList.add('no-transition');
+  track.style.transform='translateX(-'+(cur*(cw()+GAP)-(e.clientX-mx))+'px)';
+});
+window.addEventListener('mouseup',function(e){
+  if(!dragging)return;
+  dragging=false;track.classList.remove('no-transition');
+  var dx=e.clientX-mx;
+  if(Math.abs(dx)>60){stopAll();goTo(dx<0?cur+1:cur-1);}
+  else{goTo(cur);}
+});
 
-      track.appendChild(fragment);
-      slides = [...document.querySelectorAll('.ugc-card')];
-      
-      attachVideoListeners();
-      cloneForInfinite();
-    }
+/* ── RESIZE ── */
+var rt;
+window.addEventListener('resize',function(){
+  clearTimeout(rt);rt=setTimeout(function(){setW();goTo(Math.min(cur,maxI()),true);startProg();},120);
+});
 
-    function attachVideoListeners() {
-      document.querySelectorAll('.video-wrapper').forEach(wrapper => {
-        const video = wrapper.querySelector('.ugc-video');
-        const playPauseBtn = wrapper.querySelector('.play-pause-btn');
-        const muteBtn = wrapper.querySelector('.mute-btn');
-        const fullscreenBtn = wrapper.querySelector('.fullscreen-btn');
-
-        const togglePlay = () => {
-          if (video.paused) {
-            handleVideoPlay(video, wrapper);
-          } else {
-            handleVideoPause(video, wrapper);
-          }
-        };
-
-        playPauseBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          togglePlay();
-        });
-
-        wrapper.addEventListener('click', (e) => {
-          if (!e.target.closest('.control-btn')) {
-            togglePlay();
-          }
-        });
-
-        muteBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          toggleMute(video, muteBtn);
-        });
-
-        fullscreenBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          requestFullscreen(video);
-        });
-
-        video.addEventListener('ended', () => {
-          handleVideoEnded(video, wrapper);
-        });
-
-        video.addEventListener('volumechange', () => {
-          muteBtn.innerHTML = video.muted ? 
-            '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>' :
-            '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
-        });
-      });
-    }
-
-    function cloneForInfinite() {
-      const originalCount = UGC_VIDEOS.length;
-      const clonesBefore = 3;
-      const clonesAfter = 3;
-      
-      const allCards = [...track.children];
-      allCards.forEach(c => { if (c.classList.contains('clone')) c.remove(); });
-      
-      const originalCards = [...track.children];
-      
-      for (let i = 0; i < clonesBefore; i++) {
-        const cloneIdx = (originalCount - (i % originalCount) - 1 + originalCount) % originalCount;
-        const clone = originalCards[cloneIdx].cloneNode(true);
-        clone.classList.add('clone');
-        clone.dataset.clone = 'before';
-        track.insertBefore(clone, track.firstChild);
-      }
-      
-      for (let i = 0; i < clonesAfter; i++) {
-        const cloneIdx = i % originalCount;
-        const clone = originalCards[cloneIdx].cloneNode(true);
-        clone.classList.add('clone');
-        clone.dataset.clone = 'after';
-        track.appendChild(clone);
-      }
-      
-      slides = [...track.querySelectorAll('.ugc-card')];
-      infiniteExtras = clonesBefore;
-      
-      attachVideoListeners();
-    }
-
-    function setTransformPosition(indexWithOffset) {
-      updateDimensions();
-      const translateX = -indexWithOffset * itemWidth;
-      track.style.transform = `translateX(${translateX}px)`;
-      currentTranslate = translateX;
-    }
-
-    function goToLogicalIndex(logicalIdx, smooth = true) {
-      const totalOriginals = UGC_VIDEOS.length;
-      let wrapped = ((logicalIdx % totalOriginals) + totalOriginals) % totalOriginals;
-      currentIndex = wrapped;
-      
-      const offsetIndex = wrapped + infiniteExtras;
-      setTransformPosition(offsetIndex);
-      
-      resetProgress();
-      startProgressTimer();
-      
-      setTimeout(() => lazyLoadVisible(), 60);
-      
-      stopCurrentlyPlaying();
-    }
-
-    function nextSlide() {
-      goToLogicalIndex(currentIndex + 1);
-    }
-
-    function prevSlide() {
-      goToLogicalIndex(currentIndex - 1);
-    }
-
-    function startAutoplay() {
-      stopAutoplay();
-      autoplayInterval = setInterval(() => {
-        if (isDragging || isHovering || currentlyPlayingVideo) return;
-        nextSlide();
-      }, 6000);
-    }
-
-    function stopAutoplay() {
-      if (autoplayInterval) clearInterval(autoplayInterval);
-    }
-
-    function resetProgress() {
-      progressWidth = 0;
-      progressFill.style.width = '0%';
-      if (progressInterval) clearInterval(progressInterval);
-    }
-
-    function startProgressTimer() {
-      if (progressInterval) clearInterval(progressInterval);
-      progressWidth = 0;
-      progressFill.style.width = '0%';
-      const stepTime = 60;
-      const totalTime = 6000;
-      const increment = 100 / (totalTime / stepTime);
-      
-      progressInterval = setInterval(() => {
-        if (isDragging || isHovering || currentlyPlayingVideo) return;
-        progressWidth = Math.min(100, progressWidth + increment);
-        progressFill.style.width = progressWidth + '%';
-        if (progressWidth >= 100) {
-          clearInterval(progressInterval);
-        }
-      }, stepTime);
-    }
-
-    function generateThumbnailFromVideo(videoEl, src) {
-      if (!videoEl || videoEl.dataset.loaded === 'true') return;
-      
-      videoEl.src = src;
-      videoEl.load();
-      
-      videoEl.addEventListener('loadedmetadata', function onLoad() {
-        videoEl.dataset.loaded = 'true';
-        videoEl.currentTime = 0.1;
-      }, { once: true });
-      
-      videoEl.addEventListener('error', function onError(e) {
-        console.warn('Video loading error:', src);
-        videoEl.style.background = 'linear-gradient(135deg, #2bb3f3, #083d77)';
-        videoEl.dataset.loaded = 'true';
-      }, { once: true });
-    }
-
-    function lazyLoadVisible() {
-      if (!observer) {
-        observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const video = entry.target;
-              const wrapper = video.closest('.video-wrapper');
-              const src = wrapper?.dataset.videoSrc;
-              if (src && video.dataset.loaded !== 'true') {
-                generateThumbnailFromVideo(video, src);
-              }
-              observer.unobserve(video);
-            }
-          });
-        }, { rootMargin: '200px' });
-      }
-      
-      document.querySelectorAll('.ugc-video').forEach(video => {
-        if (video.dataset.loaded !== 'true') {
-          observer.observe(video);
-        }
-      });
-    }
-
-    function handleDragStart(e) {
-      const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-      startX = clientX;
-      isDragging = true;
-      dragStartTime = Date.now();
-      track.classList.add('dragging');
-      prevTranslate = currentTranslate;
-      stopAutoplay();
-      resetProgress();
-      track.style.transition = 'none';
-    }
-
-    function handleDragMove(e) {
-      if (!isDragging) return;
-      e.preventDefault();
-      const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-      const diff = clientX - startX;
-      const newTranslate = prevTranslate + diff;
-      track.style.transform = `translateX(${newTranslate}px)`;
-      currentTranslate = newTranslate;
-    }
-
-    function handleDragEnd(e) {
-      if (!isDragging) return;
-      isDragging = false;
-      track.classList.remove('dragging');
-      track.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-      
-      const movedBy = currentTranslate - prevTranslate;
-      const threshold = itemWidth * 0.2;
-      const velocity = Math.abs(movedBy) / (Date.now() - dragStartTime);
-      
-      let direction = 0;
-      if (Math.abs(movedBy) > threshold || velocity > 0.5) {
-        direction = movedBy > 0 ? -1 : 1;
-      }
-      
-      const currentOffset = -Math.round(currentTranslate / itemWidth);
-      let targetOffset = currentOffset + direction;
-      const originals = UGC_VIDEOS.length;
-      
-      let logicalTarget = (targetOffset - infiniteExtras) % originals;
-      logicalTarget = ((logicalTarget % originals) + originals) % originals;
-      
-      goToLogicalIndex(logicalTarget);
-      startAutoplay();
-    }
-
-    function initEvents() {
-      prevBtn.addEventListener('click', prevSlide);
-      nextBtn.addEventListener('click', nextSlide);
-      
-      const container = document.querySelector('.slider-container');
-      container.addEventListener('mouseenter', () => { 
-        isHovering = true; 
-        stopAutoplay(); 
-      });
-      container.addEventListener('mouseleave', () => { 
-        isHovering = false; 
-        startAutoplay(); 
-        startProgressTimer(); 
-      });
-      
-      track.addEventListener('mousedown', handleDragStart);
-      track.addEventListener('touchstart', handleDragStart, { passive: false });
-      window.addEventListener('mousemove', handleDragMove);
-      window.addEventListener('touchmove', handleDragMove, { passive: false });
-      window.addEventListener('mouseup', handleDragEnd);
-      window.addEventListener('touchend', handleDragEnd);
-      
-      track.addEventListener('dragstart', (e) => e.preventDefault());
-      
-      window.addEventListener('resize', () => {
-        updateDimensions();
-        goToLogicalIndex(currentIndex, false);
-        lazyLoadVisible();
-      });
-      
-      track.addEventListener('transitionend', () => {
-        const offset = -Math.round(currentTranslate / itemWidth);
-        const logical = (offset - infiniteExtras) % UGC_VIDEOS.length;
-        const wrapped = ((logical % UGC_VIDEOS.length) + UGC_VIDEOS.length) % UGC_VIDEOS.length;
-        if (wrapped !== currentIndex) {
-          goToLogicalIndex(wrapped, false);
-        }
-      });
-    }
-
-    function init() {
-      buildCards();
-      updateDimensions();
-      currentIndex = 0;
-      setTransformPosition(infiniteExtras);
-      
-      setTimeout(() => {
-        lazyLoadVisible();
-      }, 100);
-      
-      startAutoplay();
-      startProgressTimer();
-      initEvents();
-    }
-
-    init();
-  })();
+/* ── INIT ── */
+setW();goTo(0);
+}();
 </script>
 </body>
 </html>
